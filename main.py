@@ -1,19 +1,25 @@
 from data.places import places
-from src.recommender import recommend_places
+from src.embeddings import rank_places_ml
+from src.planner import build_itinerary
 
 user = {
     "city": "Tokyo",
     "days": 2,
-    "interests": ["anime", "food"]
+    "interests": ["I like arcades and anime", "I want to see temples", "I enjoy nature and parks"]
 }
 
-recs = recommend_places(
-    user["city"],
-    user["interests"],
-    places
-)
+ranked = rank_places_ml(places, user["interests"])
 
-print("Recomendaciones:\n")
+print("🏆 RANKING DE LUGARES:\n")
+for r in ranked:
+    print(f"{r['name']} - score: {r['score']}")
 
-for r in recs:
-    print(f"- {r['name']} ({r['category']})")
+itinerary = build_itinerary(ranked, user["days"])
+
+print("\n🧭 ITINERARIO:\n")
+
+for i, day in enumerate(itinerary):
+    print(f"Día {i+1}:")
+    for place in day:
+        print(f" - {place['name']} ({place['category']})")
+    print()
